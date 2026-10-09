@@ -1,0 +1,23 @@
+[
+  {
+    "map": "water",
+    "effects": 41,
+    "maxPositionError": 1.9301011127401613e-06,
+    "tiles": 1341,
+    "allFilesExist": true
+  },
+  {
+    "map": "oil",
+    "effects": 21,
+    "maxPositionError": 1.5259981123044982e-06,
+    "tiles": 613,
+    "allFilesExist": true
+  },
+  {
+    "map": "wine",
+    "effects": 21,
+    "maxPositionError": 8.400999266998354e-07,
+    "tiles": 253,
+    "allFilesExist": true
+  }
+]
