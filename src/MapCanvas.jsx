@@ -1,4 +1,5 @@
 import React,{forwardRef,useEffect,useImperativeHandle,useRef} from 'react';
+import {dataUrl} from './assets.js';
 import {label} from './names.js';
 const MAX_ZOOM=200;
 
@@ -29,7 +30,7 @@ export default forwardRef(function MapCanvas({data,options,selected,onSelect,onV
     function loadTile(level,x,y){
       const key=`${level}/${x}_${y}`;
       if(tiles.has(key)){const image=tiles.get(key);tiles.delete(key);tiles.set(key,image);return image;}
-      if(!pending.has(key)&&!failures.has(key)){pending.add(key);const img=new Image();img.onload=()=>{pending.delete(key);if(disposed)return;tiles.set(key,img);if(tiles.size>180){const oldest=tiles.keys().next().value;tiles.delete(oldest);}schedule();};img.onerror=()=>{pending.delete(key);failures.add(key);if(!disposed)state.current.onView({...view.current,error:'部分地图分块未能加载，请刷新重试。'});};img.src=`/data/tiles/${map.id}/${key}.webp`;}
+      if(!pending.has(key)&&!failures.has(key)){pending.add(key);const img=new Image();img.onload=()=>{pending.delete(key);if(disposed)return;tiles.set(key,img);if(tiles.size>180){const oldest=tiles.keys().next().value;tiles.delete(oldest);}schedule();};img.onerror=()=>{pending.delete(key);failures.add(key);if(!disposed)state.current.onView({...view.current,error:'部分地图分块未能加载，请刷新重试。'});};img.src=dataUrl(`tiles/${map.id}/${key}.webp`);}
       return null;
     }
     function paintLevel(level,visible,scale,tx,ty,dpr){
@@ -85,7 +86,7 @@ export default forwardRef(function MapCanvas({data,options,selected,onSelect,onV
       canvas.dataset.scale=v.scale.toFixed(4);canvas.dataset.panX=v.x.toFixed(2);canvas.dataset.panY=v.y.toFixed(2);canvas.dataset.tiles=tiles.size;
     }
     request.current=schedule;state.current.fit=fit;state.current.zoom=zoom;
-    const paperImage=new Image();paperImage.onload=()=>{if(!disposed){paper=paperImage;schedule();}};paperImage.src='/data/paper-preview.webp';
+    const paperImage=new Image();paperImage.onload=()=>{if(!disposed){paper=paperImage;schedule();}};paperImage.src=dataUrl('paper-preview.webp');
     let previousSize='';const resize=new ResizeObserver(()=>{const r=canvas.getBoundingClientRect(),size=`${r.width}x${r.height}`;if(size!==previousSize){previousSize=size;fit();}else schedule();});resize.observe(canvas);
     function wheel(e){e.preventDefault();const r=canvas.getBoundingClientRect();zoom(Math.exp(-Math.max(-250,Math.min(250,e.deltaY))*.002),e.clientX-r.left,e.clientY-r.top);}
     const points=new Map();let start=null,moved=false;

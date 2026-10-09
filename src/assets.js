@@ -1,11 +1,13 @@
+export const assetBase = import.meta.env.VITE_ASSET_BASE_URL || import.meta.env.BASE_URL;
+export const dataUrl = name => `${assetBase}data/${name}`;
 const jsonCache = new Map();
 const imageCache = new Map();
 export function loadJson(name) {
-  if (!jsonCache.has(name)) jsonCache.set(name, fetch(`/data/${name}`).then(r => {if (!r.ok) throw new Error(`无法读取 ${name}`); return r.json();}).catch(e=>{jsonCache.delete(name);throw e;}));
+  if (!jsonCache.has(name)) jsonCache.set(name, fetch(dataUrl(name)).then(r => {if (!r.ok) throw new Error(`无法读取 ${name}`); return r.json();}).catch(e=>{jsonCache.delete(name);throw e;}));
   return jsonCache.get(name);
 }
 export function loadImage(name) {
-  if (!imageCache.has(name)) imageCache.set(name, new Promise((resolve, reject) => {const image = new Image(); image.onload = () => resolve(image); image.onerror = () => reject(new Error(`无法读取图片 ${name}`)); image.src = `/data/${name}`;}).catch(e=>{imageCache.delete(name);throw e;}));
+  if (!imageCache.has(name)) imageCache.set(name, new Promise((resolve, reject) => {const image = new Image(); image.onload = () => resolve(image); image.onerror = () => reject(new Error(`无法读取图片 ${name}`)); image.src = dataUrl(name);}).catch(e=>{imageCache.delete(name);throw e;}));
   return imageCache.get(name);
 }
 export async function loadMap(id, onProgress) {
